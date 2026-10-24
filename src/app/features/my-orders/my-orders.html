@@ -1,0 +1,118 @@
+<main class="orders">
+
+  <header class="orders__head">
+    <div>
+      <h1 class="orders__title">طلباتي</h1>
+      <p class="orders__subtitle">
+        متابعة قائمة الطلبات وحالة السداد الخاصة بخدماتك المحاسبية والإدارية بكل دقة وموثوقية.
+      </p>
+    </div>
+
+    <a routerLink="/home" class="orders__new">
+      طلب خدمة جديدة
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </a>
+  </header>
+
+  <div class="filters">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" [class.active]="filter() === 'all'" [attr.aria-selected]="filter() === 'all'" (click)="setFilter('all')">
+        الكل <span>({{ allCount() }})</span>
+      </button>
+      <button type="button" role="tab" [class.active]="filter() === 'unpaid'" [attr.aria-selected]="filter() === 'unpaid'" (click)="setFilter('unpaid')">
+        بانتظار السداد <span>({{ unpaidCount() }})</span>
+      </button>
+      <button type="button" role="tab" [class.active]="filter() === 'paid'" [attr.aria-selected]="filter() === 'paid'" (click)="setFilter('paid')">
+        مكتمل السداد <span>({{ paidCount() }})</span>
+      </button>
+    </div>
+  </div>
+
+  <section class="table-card">
+    @if (error(); as err) {
+      <p class="alert alert--error state" role="alert">{{ err }}</p>
+    } @else if (loading()) {
+      <p class="state">جارٍ تحميل الطلبات...</p>
+    } @else if (!items().length) {
+      <div class="state">
+        <p>لا توجد طلبات في هذه القائمة حتى الآن.</p>
+        <a routerLink="/home" class="state__link">ابدأ بطلب خدمة جديدة</a>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="orders-table">
+          <thead>
+            <tr>
+              <th>رقم الطلب والتوثيق</th>
+              <th>تفاصيل الخدمة والتصنيف</th>
+              <th>تاريخ التقديم والتحديث</th>
+              <th>التكلفة والرسوم</th>
+              <th>حالة الطلب</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of items(); track o.requestID) {
+                <tr [class.clickable]="!o.isPaidComplete" (click)="open(o)">
+                   <td>
+                    <span class="code">
+                        <i class="dot" [class.dot--paid]="o.isPaidComplete"></i>
+                        @if (o.isPaidComplete) {
+                        <span dir="ltr">{{ o.orderCode }}</span>
+                        } @else {
+                        <a class="code__link" dir="ltr" [routerLink]="['/orders', o.requestID, 'pay']" (click)="$event.stopPropagation()">{{ o.orderCode }}</a>
+                        }
+                    </span>
+                    </td>
+                <td>
+                  <div class="stack">
+                    <strong>{{ o.service }}</strong>
+                    <small>{{ o.category }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="stack">
+                    <span>{{ formatDate(o.createdAt) }}</span>
+                    <small>آخر تحديث: {{ formatUpdated(o.updatedAt) }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="price">
+                    <strong>{{ o.price | number: '1.0-2' }}</strong>
+                    <small>ج.م</small>
+                  </span>
+                </td>
+                <td>
+                  <span class="pill" [class.pill--paid]="o.isPaidComplete">
+                    <i class="dot"></i>
+                    {{ o.isPaidComplete ? 'مكتمل السداد' : 'بانتظار السداد' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="table-foot">
+        @if (range(); as r) {
+          <span>عرض {{ r.from }}-{{ r.to }} من إجمالي {{ r.total }} طلبات</span>
+        }
+
+        <nav class="pager" aria-label="التنقل بين الصفحات">
+          <button type="button" [disabled]="!data()?.hasPreviousPage" (click)="goTo(pageNumber() - 1)" aria-label="الصفحة السابقة">›</button>
+          @for (p of pages(); track p) {
+            <button type="button" [class.active]="p === pageNumber()" (click)="goTo(p)">{{ p }}</button>
+          }
+          <button type="button" [disabled]="!data()?.hasNextPage" (click)="goTo(pageNumber() + 1)" aria-label="الصفحة التالية">‹</button>
+        </nav>
+      </div>
+    }
+  </section>
+
+</main>
+
+<footer class="foot">
+  <strong>المحاسب</strong> © {{ year }} جميع الحقوق محفوظة
+</footer>

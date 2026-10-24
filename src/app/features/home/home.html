@@ -1,0 +1,27 @@
+<main class="home">
+  <header class="home__intro">
+    <h1 class="home__title">المحاسب للخدمات والمعاملات الإدارية والمالية</h1>
+    <p class="home__text">
+      منصة متخصصة في تيسير الإجراءات الحكومية، تأسيس الشركات، وإدارة المعاملات المالية والمحاسبية
+      المعتمدة للشركات ورواد الأعمال بأعلى معايير الدقة والالتزام المؤسسي.
+    </p>
+  </header>
+
+  @if (loading()) {
+    <p class="home__state">جارٍ تحميل الخدمات...</p>
+  } @else if (error()) {
+    <p class="alert alert--error" role="alert">{{ error() }}</p>
+  } @else {
+    <div class="home__grid">
+      @for (category of categories(); track category.id) {
+        <a class="card" [routerLink]="['/categories', category.id]">
+          <img class="card__img" [src]="category.url" [alt]="category.name" loading="lazy" />
+          <div class="card__body">
+            <span class="card__name">{{ category.name }}</span>
+            <span class="card__arrow">←</span>
+          </div>
+        </a>
+      }
+    </div>
+  }
+</main>

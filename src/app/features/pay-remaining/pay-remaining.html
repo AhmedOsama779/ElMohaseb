@@ -1,0 +1,196 @@
+<main class="pay">
+  @if (loading()) {
+    <p class="pay__state">جارٍ تحميل بيانات الطلب...</p>
+  } @else if (error(); as err) {
+    <p class="alert alert--error" role="alert">{{ err }}</p>
+    <a routerLink="/orders" class="back">← العودة إلى طلباتي</a>
+  } @else if (request(); as req) {
+
+    <nav class="crumbs" aria-label="مسار التنقل">
+      <a routerLink="/orders">← طلباتي</a>
+      <span aria-hidden="true">/</span>
+      <strong>سداد الرصيد المتبقي</strong>
+    </nav>
+
+    <div class="sheet">
+
+      <header class="head">
+        <div class="head__top">
+          <span class="head__code" dir="ltr">{{ req.orderCode }}</span>
+          <span class="pill" [class.pill--paid]="req.isPaidComplete">
+            <i class="dot"></i>
+            {{ req.isPaidComplete ? 'مكتمل السداد' : 'بانتظار سداد المتبقي' }}
+          </span>
+        </div>
+
+        @if (serviceName(); as name) {
+          <h1 class="head__title">{{ name }}</h1>
+        }
+
+        <p class="head__date">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="5" width="18" height="16" rx="2" />
+            <path d="M3 10h18M8 3v4M16 3v4" />
+          </svg>
+          تاريخ تقديم الطلب: {{ formatDate(req.createdAt) }}
+        </p>
+      </header>
+
+      <section class="money">
+        <div class="money__head">
+          <h2>الموقف المالي للطلب</h2>
+          <small>جميع المبالغ بالجنيه المصري (EGP)</small>
+        </div>
+
+        <div class="money__grid">
+          <div class="money__card">
+            <span class="money__label">إجمالي تكلفة الخدمة</span>
+            <strong class="money__value">{{ req.price | number: '1.0-2' }} <small>ج.م</small></strong>
+            <small class="money__note">شاملة الرسوم الحكومية والأتعاب</small>
+          </div>
+
+          <div class="money__card">
+            <span class="money__label">العربون المسدد مسبقًا</span>
+            <strong class="money__value">{{ req.deposit | number: '1.0-2' }} <small>ج.م</small></strong>
+            <small class="money__note">تم التحقق والاعتماد</small>
+          </div>
+
+          <div class="money__card money__card--due">
+            <span class="money__label">المبلغ المتبقي المطلوب</span>
+            <strong class="money__value">{{ req.remind | number: '1.0-2' }} <small>ج.م</small></strong>
+            <small class="money__note">مستحق للإفراج عن الوثائق وتفعيل السجل</small>
+          </div>
+        </div>
+      </section>
+
+      @if (req.isPaidComplete) {
+
+        <section class="notice">
+          <h2>تم سداد هذا الطلب بالكامل</h2>
+          <p>لا يوجد مبلغ متبقي على هذا الطلب.</p>
+          <a routerLink="/orders" class="back">← العودة إلى طلباتي</a>
+        </section>
+
+      } @else if (done()) {
+
+        <section class="notice notice--ok">
+          <h2>تم إرسال إيصال السداد بنجاح</h2>
+          <p>سنراجع الإيصال خلال ساعات العمل الرسمية، وسيصلك تأكيد على بريدك الإلكتروني.</p>
+          <a routerLink="/orders" class="back">← العودة إلى طلباتي</a>
+        </section>
+
+      } @else {
+
+        <section class="insta">
+          <div class="insta__head">
+            <div>
+              <h2>تعليمات التحويل عبر إنستاباي (InstaPay)</h2>
+              <p>
+                يرجى تحويل كامل المبلغ المتبقي ({{ req.remind | number: '1.0-2' }} ج.م)
+                باستخدام البيانات الرسمية المعتمدة التالية
+              </p>
+            </div>
+            <span class="insta__badge">تحويل فوري ولحظي</span>
+          </div>
+
+          @if (payment(); as p) {
+            <div class="insta__grid">
+              <div class="insta__item">
+                <span class="insta__label">اسم الحساب / المستلم المعتمد</span>
+                <strong>{{ p.accountName }}</strong>
+              </div>
+
+              <div class="insta__item">
+                <span class="insta__label">رقم الدفع عبر إنستاباي (رقم الهاتف)</span>
+                <span class="insta__id">
+                  <code dir="ltr">{{ phone() }}</code>
+                  <button type="button" class="copy" (click)="copyPhone()">
+                    {{ copied() ? 'تم النسخ' : 'نسخ الرقم' }}
+                  </button>
+                </span>
+                @if (p.notes) {
+                  <small class="insta__note">{{ p.notes }}</small>
+                }
+              </div>
+            </div>
+          } @else {
+            <p class="insta__note">بيانات الدفع غير متاحة حاليًا، يرجى المحاولة لاحقًا.</p>
+          }
+        </section>
+
+        <section class="form">
+          <h2>نموذج تأكيد سداد المتبقي</h2>
+          <p class="form__hint">
+            أدخل تفاصيل الحوالة وارفق صورة إيصال التحويل للمطابقة الفورية والبدء في استخراج المخرجات.
+          </p>
+
+          <div class="form__label">
+            <span>صورة إيصال التحويل (JPG أو PNG فقط) <em>*</em></span>
+            <small>الحد الأقصى 5 ميجابايت</small>
+          </div>
+
+          <label
+            class="drop"
+            [class.drop--over]="dragging()"
+            [class.drop--has-file]="receipt()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave()"
+            (drop)="onDrop($event)"
+          >
+            <input class="drop__input" type="file" accept=".jpg,.jpeg,.png" (change)="onFileInput($event)" />
+
+            <span class="drop__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 18a4 4 0 01-.5-7.97A6 6 0 0118 9a4.5 4.5 0 011 8.9" />
+                <path d="M12 12v8M9 15l3-3 3 3" />
+              </svg>
+            </span>
+
+            @if (receipt(); as file) {
+              <strong class="drop__title">{{ file.name }}</strong>
+              <small class="drop__sub">{{ file.size / 1024 | number: '1.0-0' }} KB، اضغط لتغيير الملف</small>
+            } @else {
+              <strong class="drop__title">اضغط هنا لاختيار صورة الإيصال أو اسحب الملف وأفلته هنا</strong>
+              <small class="drop__sub">تأكد من وضوح وقت وتاريخ العملية والمبلغ والرقم المرجعي في لقطة الشاشة</small>
+            }
+          </label>
+
+          @if (fileError(); as err) {
+            <span class="field__error">{{ err }}</span>
+          }
+
+          <p class="note">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 11v5M12 8h.01" />
+            </svg>
+            <span>
+              <strong>ملاحظة أمنية وتنظيمية:</strong>
+              يتم فحص مطابقة الإيصال والرقم المرجعي فور استلام النموذج خلال دقائق العمل الرسمية،
+              وبمجرد التحقق يتم تفعيل تحميل النسخ الإلكترونية للسجل التجاري وتسليم أصول الأوراق.
+            </span>
+          </p>
+
+          @if (submitErrors().length) {
+            <ul class="alert alert--error" role="alert">
+              @for (e of submitErrors(); track $index) {
+                <li>{{ e }}</li>
+              }
+            </ul>
+          }
+
+          <button type="button" class="btn btn--primary send" [disabled]="!canSubmit()" (click)="submit()">
+            {{ submitting() ? 'جارٍ الإرسال...' : 'إرسال إيصال المتبقي' }}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 2L11 13" />
+              <path d="M22 2l-7 20-4-9-9-4z" />
+            </svg>
+          </button>
+
+          <a routerLink="/orders" class="back">← العودة إلى طلباتي</a>
+        </section>
+
+      }
+    </div>
+  }
+</main>

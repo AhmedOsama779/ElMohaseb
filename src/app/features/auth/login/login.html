@@ -1,0 +1,55 @@
+<div class="login">
+  <h1 class="login__title">تسجيل الدخول إلى حسابك</h1>
+  <p class="login__subtitle">أدخل بيانات الاعتماد لمتابعة طلباتك المحاسبية</p>
+
+  @if (justVerified) {
+    <p class="alert alert--success" role="status">تم تفعيل حسابك بنجاح، يمكنك الآن تسجيل الدخول.</p>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="field">
+      <label class="field__label" for="email">البريد الإلكتروني</label>
+      <input
+        id="email"
+        type="email"
+        class="field__input"
+        formControlName="email"
+        placeholder="name@company.com"
+        [class.invalid]="email.invalid && email.touched"
+      />
+      @if (email.touched && email.errors?.['required']) {
+        <span class="field__error">البريد الإلكتروني مطلوب</span>
+      } @else if (email.touched && email.errors?.['email']) {
+        <span class="field__error">صيغة البريد الإلكتروني غير صحيحة</span>
+      }
+    </div>
+
+    <div class="field">
+      <div class="field__row">
+        <label class="field__label" for="password">كلمة المرور</label>
+        <a class="field__link" routerLink="/forgot-password">نسيت كلمة المرور؟</a>
+      </div>
+      <input
+        id="password"
+        type="password"
+        class="field__input"
+        formControlName="password"
+        placeholder="••••••••"
+        [class.invalid]="password.invalid && password.touched"
+      />
+      @if (password.touched && password.errors?.['required']) {
+        <span class="field__error">كلمة المرور مطلوبة</span>
+      } @else if (password.touched && password.errors?.['minlength']) {
+        <span class="field__error">كلمة المرور يجب ألا تقل عن 6 أحرف</span>
+      }
+    </div>
+
+    @if (serverError()) {
+      <p class="alert alert--error" role="alert">{{ serverError() }}</p>
+    }
+
+    <button type="submit" class="btn btn--primary" [disabled]="loading()">
+      {{ loading() ? 'جارٍ الدخول...' : 'دخول' }}
+    </button>
+  </form>
+</div>

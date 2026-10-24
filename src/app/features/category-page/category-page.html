@@ -1,0 +1,275 @@
+<main class="cat">
+  @if (loading()) {
+    <p class="cat__state">جارٍ تحميل الخدمات...</p>
+  } @else if (error()) {
+    <p class="alert alert--error" role="alert">{{ error() }}</p>
+  } @else if (category(); as cat) {
+
+    <nav class="crumbs" aria-label="مسار التنقل">
+      <a routerLink="/home">الخدمات المحاسبية والقانونية</a>
+      <span aria-hidden="true">‹</span>
+      <span class="crumbs__current">{{ cat.name }}</span>
+    </nav>
+
+    <h1 class="cat__title">تصنيف: {{ cat.name }}</h1>
+    <p class="cat__subtitle">
+      اختر نوع الكيان التجاري لاستعراض المتطلبات النظامية، رفع مسوغات التأسيس، وسداد العربون الإداري المباشر.
+    </p>
+
+    @if (created(); as order) {
+
+      <section class="success">
+        <h2>تم إرسال طلبك بنجاح</h2>
+        <p>رقم الطلب:</p>
+        <strong dir="ltr">{{ order.orderCode }}</strong>
+        <p class="hint">احتفظ برقم الطلب، ستحتاجه لاستكمال سداد المبلغ المتبقي لاحقًا.</p>
+        <a routerLink="/orders" class="success__link">عرض طلباتي</a>
+        <a routerLink="/home" class="success__link">العودة للرئيسية</a>
+      </section>
+
+    } @else {
+
+      <div class="section-head">
+        <h2>الخدمات التابعة للتصنيف</h2>
+        <span>انقر لتحديد الخدمة وعرض متطلباتها فورًا</span>
+      </div>
+
+      <div class="services">
+        @for (s of cat.services; track s.id) {
+          <button
+            type="button"
+            class="service"
+            [class.selected]="s.id === selectedId()"
+            [attr.aria-pressed]="s.id === selectedId()"
+            (click)="selectService(s.id)"
+          >
+            <span class="service__media">
+              <img [src]="s.url" [alt]="s.name" loading="lazy" />
+              @if (s.id === selectedId()) {
+                <span class="service__badge">● محدد حاليًا</span>
+              }
+            </span>
+            <span class="service__body">
+              <strong class="service__name">{{ s.name }}</strong>
+              <span class="service__desc">{{ s.description }}</span>
+              <span class="service__fee">
+                <span>إجمالي الأتعاب</span>
+                <strong>{{ s.price | number: '1.0-2' }} ج.م</strong>
+              </span>
+            </span>
+          </button>
+        }
+      </div>
+
+      @if (selectedService(); as svc) {
+
+        <section class="detail">
+          <img class="detail__img" [src]="svc.url" [alt]="svc.name" />
+          <div class="detail__info">
+            <span class="detail__eyebrow">تفاصيل ملف المعاملة المختارة</span>
+            <h2 class="detail__title">{{ svc.name }}</h2>
+            <p class="detail__desc">{{ svc.description }}</p>
+
+            <dl class="detail__amounts">
+              <div>
+                <dt>التكلفة الإجمالية للخدمة</dt>
+                <dd class="total">{{ svc.price | number: '1.0-2' }} ج.م</dd>
+              </div>
+              <div>
+                <dt>عربون بدء الإجراءات (InstaPay)</dt>
+                <dd class="deposit">{{ svc.deposit | number: '1.0-2' }} ج.م</dd>
+              </div>
+              <div>
+                <dt>المتبقي عند استلام الخدمة</dt>
+                <dd>{{ svc.remind | number: '1.0-2' }} ج.م</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="block">
+          <h2 class="block__title">المستندات المطلوبة (Required Documents)</h2>
+          <p class="block__hint">
+            راجع قائمة المسوغات المعتمدة وقم برفع النسخ الإلكترونية طبقًا للشروط الفنية الموضحة.
+          </p>
+
+          @if (blockedMessage(); as msg) {
+            <p class="alert alert--error" role="alert">{{ msg }}</p>
+          }
+
+          <div class="docs-card">
+            @if (statusLoading()) {
+              <p class="hint">جارٍ تحميل المستندات...</p>
+            } @else {
+              <table class="docs">
+                <thead>
+                  <tr>
+                    <th>اسم المستند</th>
+                    <th>حالة الإلزام</th>
+                    <th>حالة الرفع الحالية</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (d of statuses(); track d.id) {
+                    @let st = statusOf(d);
+                    <tr>
+                      <td>{{ d.name }}</td>
+                      <td>
+                        <span class="badge" [class.badge--required]="d.isMandatory">
+                          {{ d.isMandatory ? 'إلزامي' : 'اختياري' }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="status status--{{ st.kind }}">
+                          <i class="dot"></i>{{ st.text }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        </section>
+
+        @if (pendingDocs().length && !blockedMessage()) {
+          <section class="block">
+            <h2 class="block__title">رفع المستندات (Upload Required Documents)</h2>
+            <p class="block__hint">يرجى رفع ملفات واضحة ومعاينة الحجم قبل الإرسال.</p>
+
+            <div class="uploads">
+              @for (d of pendingDocs(); track d.id; let i = $index) {
+                <label class="upload" [class.has-file]="files()[d.id]">
+                  <span class="upload__label">
+                    {{ i + 1 }}. {{ d.name }}
+                    @if (d.isMandatory) {
+                      <em>*</em>
+                    } @else {
+                      <small>(اختياري)</small>
+                    }
+                  </span>
+                  <span class="upload__pick">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z" />
+                      <path d="M14 3v5h5" />
+                    </svg>
+                    {{ files()[d.id]?.name ?? 'اختيار ملف (JPG, PNG, PDF)' }}
+                  </span>
+                  <input
+                    class="upload__input"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    (change)="onDocChosen(d.id, $event)"
+                  />
+                  @if (fileErrors()['doc-' + d.id]; as err) {
+                    <span class="field__error">{{ err }}</span>
+                  }
+                </label>
+              }
+            </div>
+          </section>
+        }
+
+        <section class="pay">
+          <h2 class="pay__title">تعليمات السداد المالي عبر إنستاباي (InstaPay Instructions)</h2>
+
+          <div class="pay__grid">
+            <div class="pay__item">
+              <span class="pay__label">سعر الخدمة الكامل</span>
+              <strong class="pay__value">{{ svc.price | number: '1.0-2' }} ج.م</strong>
+            </div>
+
+            <div class="pay__item">
+              <span class="pay__label pay__label--accent">قيمة العربون المطلوب فورًا</span>
+              <strong class="pay__value pay__value--accent">{{ svc.deposit | number: '1.0-2' }} ج.م</strong>
+            </div>
+
+            <div class="pay__item">
+              <span class="pay__label">المبلغ المتبقي</span>
+              <strong class="pay__value">{{ svc.remind | number: '1.0-2' }} ج.م</strong>
+              <small class="pay__note">يسدد عند تسليم الخدمة المعتمدة</small>
+            </div>
+
+           <div class="pay__item">
+  <span class="pay__label">رقم الدفع عبر إنستاباي (رقم الهاتف)</span>
+  @if (paymentNumber(); as phone) {
+    <span class="pay__ipa">
+      <code dir="ltr">{{ phone }}</code>
+      <button type="button" class="pay__copy" (click)="copyIpan()" aria-label="نسخ رقم الدفع">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="11" height="11" rx="2" />
+          <path d="M5 15V6a2 2 0 012-2h9" />
+        </svg>
+      </button>
+      @if (copied()) {
+        <small class="pay__note">تم النسخ</small>
+      }
+    </span>
+    <small class="pay__note">اسم الحساب: {{ payment()?.accountName }}</small>
+    @if (payment()?.notes) {
+      <small class="pay__note">{{ payment()?.notes }}</small>
+    }
+  } @else {
+    <small class="pay__note">بيانات الدفع غير متاحة حاليًا، يرجى المحاولة لاحقًا.</small>
+  }
+</div>
+          </div>
+
+          <div class="receipt">
+            <h3 class="receipt__title">بيانات إيصال سداد العربون (Deposit Receipt Details)</h3>
+            <p class="receipt__hint">
+              يرجى تحويل مبلغ العربون ({{ svc.deposit | number: '1.0-2' }} ج.م) ورفع الإيصال مع الطلب.
+            </p>
+
+            <span class="receipt__label">صورة إيصال التحويل <em>*</em></span>
+            <label class="upload" [class.has-file]="receipt()">
+              <span class="upload__pick">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 2h12v20l-3-2-3 2-3-2-3 2z" />
+                  <path d="M9 8h6M9 12h6" />
+                </svg>
+                {{ receipt()?.name ?? 'رفع صورة الإيصال (JPG / PNG)' }}
+              </span>
+              <input
+                class="upload__input"
+                type="file"
+                accept=".jpg,.jpeg,.png"
+                (change)="onReceiptChosen($event)"
+              />
+              @if (fileErrors()['receipt']; as err) {
+                <span class="field__error">{{ err }}</span>
+              }
+            </label>
+
+            <p class="receipt__note">يقبل صور التحويل بصيغ JPG أو PNG فقط بحد أقصى 5 ميجابايت.</p>
+          </div>
+        </section>
+
+        @if (submitErrors().length) {
+          <ul class="alert alert--error" role="alert">
+            @for (e of submitErrors(); track $index) {
+              <li>{{ e }}</li>
+            }
+          </ul>
+        }
+
+        <div class="actions">
+          <button type="button" class="btn btn--primary submit" [disabled]="!canSubmit()" (click)="submit()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 2L11 13" />
+              <path d="M22 2l-7 20-4-9-9-4z" />
+            </svg>
+            {{ submitting() ? 'جارٍ الإرسال...' : 'إرسال الطلب' }}
+          </button>
+        </div>
+
+      } @else {
+        <p class="cat__state">لا توجد خدمات متاحة في هذا التصنيف حاليًا.</p>
+      }
+    }
+
+  } @else {
+    <p class="cat__state">هذا التصنيف غير موجود.</p>
+    <a routerLink="/home">العودة للرئيسية</a>
+  }
+</main>

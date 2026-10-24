@@ -1,0 +1,65 @@
+<section class="page-card">
+  <div class="page-card__icon">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" />
+      <rect x="9" y="10" width="6" height="5" rx="1" />
+      <path d="M10 10V8.5a2 2 0 014 0V10" />
+    </svg>
+  </div>
+
+  <p class="page-card__eyebrow">{{ isRegister ? 'تفعيل الحساب' : 'المصادقة الثنائية الآمنة' }}</p>
+  <h1 class="page-card__title">{{ isRegister ? 'تأكيد البريد الإلكتروني' : 'التحقق من رمز التأكيد' }}</h1>
+  <p class="page-card__text">
+    أدخل كود التحقق المكون من 6 أرقام المرسل إلى بريدك الإلكتروني المسجل لنظام المحاسب.
+  </p>
+
+  <!-- dir="ltr": digits are typed left to right, first box on the left -->
+  <div class="otp__boxes" dir="ltr" (paste)="onPaste($event)">
+    @for (digit of digits(); track $index) {
+      <input
+        #box
+        class="otp__box"
+        type="text"
+        inputmode="numeric"
+        maxlength="1"
+        autocomplete="one-time-code"
+        [value]="digit"
+        [attr.aria-label]="'الخانة ' + ($index + 1)"
+        (input)="onInput($index, $event)"
+        (keydown)="onKeydown($index, $event)"
+        (focus)="$any($event.target).select()"
+      />
+    }
+  </div>
+
+  @if (serverError()) {
+    <p class="alert alert--error" role="alert">{{ serverError() }}</p>
+  }
+
+  <div class="otp__meta">
+    @if (expired()) {
+      <span class="otp__expired">انتهت صلاحية الرمز</span>
+    } @else {
+      <span>ينتهي الرمز خلال: <strong>{{ timeText() }}</strong></span>
+    }
+    <button type="button" class="otp__resend" [disabled]="!canResend()" (click)="resend()">
+      إعادة إرسال الكود
+      @if (!canResend()) {
+        <span>({{ resendText() }})</span>
+      }
+    </button>
+  </div>
+
+  <p class="otp__hint">
+    لم يصلك الرمز؟ تحقق من مجلد الرسائل غير المرغوب فيها (Spam / Junk) وتأكد من صحة بريدك:
+    <strong dir="ltr">{{ email }}</strong>
+  </p>
+
+  <button type="button" class="btn btn--primary" [disabled]="!isComplete() || loading()" (click)="verify()">
+    {{ loading() ? 'جارٍ التحقق...' : 'تأكيد الرمز والمتابعة ←' }}
+  </button>
+
+  <a routerLink="/login" class="page-card__link">العودة لتسجيل الدخول →</a>
+
+  <p class="page-secure">اتصال مشفر وفق معايير الأمان المالي bit-256</p>
+</section>

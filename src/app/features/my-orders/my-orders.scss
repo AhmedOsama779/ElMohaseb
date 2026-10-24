@@ -1,0 +1,231 @@
+.orders {
+  padding: 32px;
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 30px;
+    font-weight: 700;
+
+    &::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-primary);
+    }
+  }
+
+  &__subtitle {
+    font-size: 13px;
+    color: var(--color-muted);
+  }
+
+  &__new {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &:hover { opacity: 0.9; }
+  }
+}
+
+/* ---------- Filter tabs ---------- */
+.filters {
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f1f3f5;
+  border-radius: 8px;
+
+  button {
+    padding: 6px 16px;
+    background: none;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--color-muted);
+    cursor: pointer;
+
+    &.active {
+      background: var(--color-surface);
+      color: var(--color-primary);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+  }
+}
+
+/* ---------- Table ---------- */
+.table-card {
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+}
+
+.table-scroll { overflow-x: auto; }
+
+.orders-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+
+  th {
+    padding: 14px 24px;
+    background: #f2f4f6;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: start;
+    color: var(--color-muted);
+  }
+
+  td {
+    padding: 20px 24px;
+    border-top: 1px solid var(--color-border);
+    font-size: 13px;
+  }
+}
+
+.code {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+}
+
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #92400e;
+
+  &--paid { background: var(--color-primary); }
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong { font-size: 15px; }
+  small { font-size: 11px; color: var(--color-muted); }
+}
+
+.price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+
+  strong { font-size: 15px; }
+  small { font-size: 11px; color: var(--color-muted); }
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+  border-radius: 4px;
+  background: #ffedd5;
+  color: #9a3412;
+  font-size: 11px;
+
+  .dot { background: currentColor; }
+
+  &--paid { background: #dbeafe; color: #1e40af; }
+}
+
+.state {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-muted);
+
+  &__link { color: var(--color-primary); font-weight: 600; }
+}
+
+/* ---------- Footer of the table ---------- */
+.table-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #f2f4f6;
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.pager {
+  display: flex;
+  gap: 6px;
+
+  button {
+    min-width: 32px;
+    height: 32px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+
+    &.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    &:disabled { opacity: 0.4; cursor: default; }
+  }
+}
+
+.foot {
+  padding: 20px 32px;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 12px;
+  color: var(--color-muted);
+
+  strong { color: var(--color-primary); }
+}
+.orders-table tbody tr.clickable {
+  cursor: pointer;
+
+  &:hover { background: #f8fafb; }
+}
+
+.code__link {
+  color: inherit;
+
+  &:hover { color: var(--color-primary); text-decoration: underline; }
+}

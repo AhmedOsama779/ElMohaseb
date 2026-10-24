@@ -1,0 +1,50 @@
+<header class="navbar">
+  <div class="navbar__inner">
+
+    @if (auth.user()) {
+      <a routerLink="/home" class="navbar__logo">المحاسب</a>
+    } @else {
+      <span class="navbar__logo">المحاسب</span>
+    }
+
+    <nav class="navbar__links">
+      <a routerLink="/about" routerLinkActive="active">عن المحاسب / التواصل</a>
+    </nav>
+
+    @if (auth.user(); as user) {
+      <div class="navbar__user">
+        <button type="button" class="navbar__user-btn" (click)="menuOpen.set(!menuOpen())">
+          <span class="navbar__user-info">
+            <strong>{{ user.name }}</strong>
+            <small dir="ltr">{{ user.email }}</small>
+          </span>
+          <span class="navbar__avatar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="8" r="4" />
+              <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+            </svg>
+          </span>
+        </button>
+
+        @if (menuOpen()) {
+          <div class="navbar__menu">
+            <!-- TODO: real label and route once the page is decided -->
+           <a routerLink="/orders" (click)="menuOpen.set(false)">طلباتي</a>
+            <button type="button" (click)="logout()">تسجيل الخروج</button>
+          </div>
+        }
+      </div>
+    } @else {
+      <a routerLink="/login" class="navbar__login">
+        تسجيل الدخول
+        <span class="navbar__avatar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+          </svg>
+        </span>
+      </a>
+    }
+
+  </div>
+</header>

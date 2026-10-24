@@ -1,0 +1,138 @@
+
+<div class="register">
+  <h1 class="register__title">إنشاء حساب جديد</h1>
+  <p class="register__subtitle">أدخل بياناتك لإنشاء حساب ومتابعة طلباتك المحاسبية</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+
+    <div class="field">
+      <label class="field__label" for="fullname">الاسم الكامل</label>
+      <input
+        id="fullname"
+        class="field__input"
+        formControlName="fullname"
+        [class.invalid]="c.fullname.invalid && c.fullname.touched"
+      />
+      @if (c.fullname.touched && c.fullname.errors) {
+        <span class="field__error">الاسم الكامل مطلوب (3 أحرف على الأقل)</span>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="email">البريد الإلكتروني</label>
+      <input
+        id="email"
+        type="email"
+        class="field__input"
+        formControlName="email"
+        placeholder="name@company.com"
+        [class.invalid]="c.email.invalid && c.email.touched"
+      />
+      @if (c.email.touched && c.email.errors) {
+        <span class="field__error">أدخل بريدًا إلكترونيًا صحيحًا</span>
+      }
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="waPhone">رقم الواتساب</label>
+      <input
+        id="waPhone"
+        type="tel"
+        class="field__input"
+        formControlName="waPhone"
+        placeholder="+201001234567"
+        [class.invalid]="c.waPhone.invalid && c.waPhone.touched"
+      />
+      @if (c.waPhone.touched && c.waPhone.errors) {
+        <span class="field__error">أدخل رقمًا صحيحًا (10 إلى 15 رقمًا)</span>
+      }
+    </div>
+
+    <!-- Country and City: side by side -->
+    <div class="field-row">
+
+      <div class="field">
+        <label class="field__label" for="country">الدولة</label>
+        <select
+          id="country"
+          class="field__input"
+          formControlName="country"
+          [class.invalid]="c.country.invalid && c.country.touched"
+        >
+          <option [ngValue]="0" disabled>اختر الدولة</option>
+          @for (country of countries(); track country.id) {
+            <option [ngValue]="country.id">{{ country.name }}</option>
+          }
+        </select>
+        @if (c.country.touched && c.country.errors) {
+          <span class="field__error">الدولة مطلوبة</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="city">المدينة</label>
+        <select
+          id="city"
+          class="field__input"
+          formControlName="city"
+          [class.invalid]="c.city.invalid && c.city.touched"
+        >
+          <option [ngValue]="0" disabled>اختر المدينة</option>
+          @for (city of cities(); track city.id) {
+            <option [ngValue]="city.id">{{ city.name }}</option>
+          }
+        </select>
+        @if (c.city.touched && c.city.errors) {
+          <span class="field__error">المدينة مطلوبة</span>
+        }
+      </div>
+
+    </div>
+
+    <!-- Password and Confirm Password: side by side -->
+    <div class="field-row">
+
+      <div class="field">
+        <label class="field__label" for="password">كلمة المرور</label>
+        <input
+          id="password"
+          type="password"
+          class="field__input"
+          formControlName="password"
+          placeholder="••••••••"
+          [class.invalid]="c.password.invalid && c.password.touched"
+        />
+        @if (c.password.touched && c.password.errors) {
+          <span class="field__error">كلمة المرور يجب أن تتكون من 8 أحرف على الأقل وتحتوي على حرف كبير ورقم ورمز خاص</span>
+        }
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="passwordConfirmation">تأكيد كلمة المرور</label>
+        <input
+          id="passwordConfirmation"
+          type="password"
+          class="field__input"
+          formControlName="passwordConfirmation"
+          placeholder="••••••••"
+          [class.invalid]="c.passwordConfirmation.touched && (c.passwordConfirmation.invalid || form.errors?.['mismatch'])"
+        />
+        @if (c.passwordConfirmation.touched && form.errors?.['mismatch']) {
+          <span class="field__error">كلمتا المرور غير متطابقتين</span>
+        }
+      </div>
+
+    </div>
+
+    @if (serverError()) {
+      <p class="field__error" style="margin-bottom: 12px">
+        {{ serverError() }}
+      </p>
+    }
+
+    <button type="submit" class="btn btn--primary" [disabled]="loading()">
+      {{ loading() ? 'جارٍ الإنشاء...' : 'إنشاء حساب' }}
+    </button>
+
+  </form>
+</div>
