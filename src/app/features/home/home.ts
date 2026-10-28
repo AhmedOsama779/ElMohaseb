@@ -2,6 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CategoryItem } from '../../core/models/api.models';
 import { Category } from '../../core/services/category';
+import { toProxyUrl } from '../../shared/utils/url';
+
 
 @Component({
   selector: 'app-home',
@@ -15,7 +17,7 @@ export class Home {
   categories = signal<CategoryItem[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
-
+  toProxyUrl = toProxyUrl;
   constructor() {
     this.categoryService.getAll().subscribe({
       next: page => {

@@ -10,6 +10,7 @@
       <input
         id="fullname"
         class="field__input"
+        dir="auto"
         formControlName="fullname"
         [class.invalid]="c.fullname.invalid && c.fullname.touched"
       />
@@ -23,6 +24,7 @@
       <input
         id="email"
         type="email"
+        dir="ltr"
         class="field__input"
         formControlName="email"
         placeholder="name@company.com"
@@ -38,6 +40,7 @@
       <input
         id="waPhone"
         type="tel"
+        dir="ltr"
         class="field__input"
         formControlName="waPhone"
         placeholder="+201001234567"
@@ -97,6 +100,7 @@
         <input
           id="password"
           type="password"
+          dir="ltr"
           class="field__input"
           formControlName="password"
           placeholder="••••••••"
@@ -112,6 +116,7 @@
         <input
           id="passwordConfirmation"
           type="password"
+          dir="ltr"
           class="field__input"
           formControlName="passwordConfirmation"
           placeholder="••••••••"

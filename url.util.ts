@@ -1,4 +1,4 @@
-import { environment } from '../../environments/environment';
+import { environment } from './src/environments/environment';
 
 const BACKEND_HTTP_ORIGIN = 'http://mohaseb-api.runasp.net';
 

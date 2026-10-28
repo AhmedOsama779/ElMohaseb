@@ -5,6 +5,9 @@ import { CategoryItem, DocumentStatus, PaymentInfo, RequestCreated } from '../..
 import { Catalog } from '../../core/services/catalog';
 import { Category } from '../../core/services/category';
 import { formatEgyptPhone } from '../../shared/utils/format';
+import { toProxyUrl } from '../../shared/utils/url';
+import { arabicError } from '../../shared/utils/errors';
+
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const DOC_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
@@ -60,7 +63,7 @@ export class CategoryPage {
       .filter(d => d.isMandatory)
       .every(d => !!this.files()[d.id]);
   });
-
+toProxyUrl = toProxyUrl;
   constructor() {
     // The categories list already includes each category's services
     this.categories.getAll(1, 50).subscribe({

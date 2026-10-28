@@ -45,11 +45,7 @@ export class Login {
     this.serverError.set(null);
 
     this.auth.login(this.form.getRawValue()).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.router.navigateByUrl('/home'),
-        console.log('Logged in, token saved');
-      },
+     next: () => this.router.navigateByUrl(this.auth.isAdmin() ? '/admin/orders' : '/home'),
       error: err => {
   this.loading.set(false);
 

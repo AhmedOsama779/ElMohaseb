@@ -18,6 +18,7 @@ export const RESEND_COOLDOWN_SECONDS = OTP_LIFETIME_SECONDS - OTP_REISSUE_WINDOW
 
 const CLAIM_NAME = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name';
 const CLAIM_EMAIL = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress';
+const CLAIM_ROLE = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
 
 // Reads the middle part of a JWT (the payload). This is only for showing the user's info,
 // the real security check always happens on the server.
@@ -46,6 +47,8 @@ export class Auth {
     const p = this.payload();
     return p ? { name: (p[CLAIM_NAME] ?? '') as string, email: (p[CLAIM_EMAIL] ?? '') as string } : null;
   });
+  role = computed(() => (this.payload()?.[CLAIM_ROLE] ?? null) as string | null);
+
 
   // Holds email + otp between the OTP page and the reset page (lost on refresh, which is fine)
   resetData: { email: string; otp: string } | null = null;
@@ -62,6 +65,9 @@ export class Auth {
     if (!p) return false;
     return !p['exp'] || p['exp'] * 1000 > Date.now();
   }
+  isAdmin(): boolean {
+  return this.isLoggedIn() && this.role() === 'Admin';
+}
 
   logout() {
     localStorage.removeItem('token');

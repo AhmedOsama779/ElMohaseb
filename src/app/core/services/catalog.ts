@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse, DocumentStatus, PagedResult, PaymentInfo, RequestCreated, RequestDetails, RequestOrder } from '../models/api.models';@Injectable({ providedIn: 'root' })
+import { ApiResponse, DocumentStatus, PagedResult, PaymentInfo, RequestCreated, RequestDetails, RequestOrder , ContactInfo } from '../models/api.models';@Injectable({ providedIn: 'root' })
 export class Catalog {
   private http = inject(HttpClient);
   private base = environment.mainApiUrl;
@@ -54,6 +54,13 @@ payRemaining(id: number, orderCode: string, receipt: File) {
   body.append('Recipt', receipt); // the API spells it "Recipt"
 
   return this.http.patch<ApiResponse<unknown>>(`${this.base}/Request/Request`, body);
+}
+
+getContact() {
+  return this.http
+    .get<ApiResponse<ContactInfo> | ContactInfo>(`${this.base}/ContactUs/ContactUs`)
+    // Works whether or not the API wraps the data in { code, message, data }
+    .pipe(map(res => ('data' in res ? res.data : res)));
 }
 
 }

@@ -19,7 +19,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((err: HttpErrorResponse) => {
-      if (err.status === 401) {
+      // Only a request that carried a token means "your session ended".
+      // A visitor without a token just gets the error and the page decides what to show.
+      if (err.status === 401 && token) {
         auth.logout();
         router.navigateByUrl('/login');
       }

@@ -1,2 +1,4 @@
-<app-navbar />
+@if (!inAdmin()) {
+  <app-navbar />
+}
 <router-outlet />

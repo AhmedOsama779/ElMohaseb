@@ -44,7 +44,7 @@
             (click)="selectService(s.id)"
           >
             <span class="service__media">
-              <img [src]="s.url" [alt]="s.name" loading="lazy" />
+              <img [src]="toProxyUrl(s.url)" [alt]="s.name" loading="lazy" />
               @if (s.id === selectedId()) {
                 <span class="service__badge">● محدد حاليًا</span>
               }
@@ -64,7 +64,7 @@
       @if (selectedService(); as svc) {
 
         <section class="detail">
-          <img class="detail__img" [src]="svc.url" [alt]="svc.name" />
+          <img class="detail__img" [src]="toProxyUrl(svc.url)" [alt]="svc.name" />
           <div class="detail__info">
             <span class="detail__eyebrow">تفاصيل ملف المعاملة المختارة</span>
             <h2 class="detail__title">{{ svc.name }}</h2>
