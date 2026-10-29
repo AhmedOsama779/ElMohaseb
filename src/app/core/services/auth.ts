@@ -65,9 +65,6 @@ export class Auth {
     if (!p) return false;
     return !p['exp'] || p['exp'] * 1000 > Date.now();
   }
-  isAdmin(): boolean {
-  return this.isLoggedIn() && this.role() === 'Admin';
-}
 
   logout() {
     localStorage.removeItem('token');
