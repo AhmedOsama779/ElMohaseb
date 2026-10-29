@@ -45,7 +45,7 @@ export class Login {
     this.serverError.set(null);
 
     this.auth.login(this.form.getRawValue()).subscribe({
-     next: () => this.router.navigateByUrl(this.auth.isAdmin() ? '/admin/orders' : '/home'),
+     next: () => this.router.navigateByUrl('/home'),
       error: err => {
   this.loading.set(false);
 

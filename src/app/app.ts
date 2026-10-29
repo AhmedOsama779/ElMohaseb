@@ -1,7 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter, map } from 'rxjs';
+import { Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './shared/components/navbar/navbar';
 
 @Component({
@@ -13,12 +11,5 @@ import { Navbar } from './shared/components/navbar/navbar';
 export class App {
   private router = inject(Router);
 
-  // The admin portal has its own header and sidebar, so the customer navbar is hidden there
-  inAdmin = toSignal(
-    this.router.events.pipe(
-      filter(e => e instanceof NavigationEnd),
-      map(() => this.router.url.startsWith('/admin'))
-    ),
-    { initialValue: window.location.pathname.startsWith('/admin') }
-  );
+  
 }
