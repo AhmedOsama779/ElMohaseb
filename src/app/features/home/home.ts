@@ -21,7 +21,7 @@ export class Home {
   constructor() {
     this.categoryService.getAll().subscribe({
       next: page => {
-        this.categories.set(page.items);
+        this.categories.set(page.items.filter(c => c.isValid !== false));
         this.loading.set(false);
       },
       error: () => {

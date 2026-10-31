@@ -68,7 +68,7 @@ toProxyUrl = toProxyUrl;
     // The categories list already includes each category's services
     this.categories.getAll(1, 50).subscribe({
       next: page => {
-        const found = page.items.find(c => c.id === this.categoryId) ?? null;
+        const found = page.items.find(c => c.id === this.categoryId && c.isValid !== false) ?? null;
         this.category.set(found);
         this.loading.set(false);
         if (found?.services.length) this.selectService(found.services[0].id);

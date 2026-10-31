@@ -56,6 +56,7 @@ export interface ServiceItem {
 export interface CategoryItem {
   id: number;
   name: string;
+  isValid:boolean;
   url: string;
   isActive?: boolean; // the list doesn't send it yet, a missing value means "active"
   services: ServiceItem[];
