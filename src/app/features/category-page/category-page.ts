@@ -1,12 +1,12 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CategoryItem, DocumentStatus, PaymentInfo, RequestCreated } from '../../core/models/api.models';
+import { CategoryItem, DocumentStatus, PaymentAccount, RequestCreated } from '../../core/models/api.models';
 import { Catalog } from '../../core/services/catalog';
 import { Category } from '../../core/services/category';
-import { formatEgyptPhone } from '../../shared/utils/format';
 import { toProxyUrl } from '../../shared/utils/url';
 import { arabicError } from '../../shared/utils/errors';
+import { PaymentAccounts } from '../../shared/components/payment-accounts/payment-accounts';
 
 
 const MAX_BYTES = 5 * 1024 * 1024;
@@ -18,7 +18,7 @@ const RECEIPT_TYPES = ['image/jpeg', 'image/png'];
 
 @Component({
   selector: 'app-category-page',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe ,PaymentAccounts],
   templateUrl: './category-page.html',
   styleUrl: './category-page.scss',
 })
@@ -43,9 +43,7 @@ export class CategoryPage {
   blockedMessage = signal<string | null>(null);
   pendingDocs = computed(() => this.statuses().filter(d => !d.isUploaded));
 
-  payment = signal<PaymentInfo | null>(null);
-  paymentNumber = computed(() => formatEgyptPhone(this.payment()?.ipan));
-  copied = signal(false);
+  
 
   files = signal<Record<number, File | undefined>>({});
   receipt = signal<File | null>(null);
@@ -54,6 +52,7 @@ export class CategoryPage {
   submitting = signal(false);
   submitErrors = signal<string[]>([]);
   created = signal<RequestCreated | null>(null);
+  accounts = signal<PaymentAccount[]>([]);
 
   canSubmit = computed(() => {
     if (this.submitting() || this.blockedMessage() || !this.selectedService() || !this.receipt()) {
@@ -79,10 +78,10 @@ toProxyUrl = toProxyUrl;
       },
     });
 
-    this.catalog.getPaymentInfo().subscribe({
-      next: info => this.payment.set(info),
-      error: () => this.payment.set(null), // 404 means the admin hasn't added payment info yet
-    });
+    this.catalog.getPaymentAccounts().subscribe({
+  next: list => this.accounts.set(list),
+  error: () => this.accounts.set([]),
+});
   }
 
   selectService(id: number) {
@@ -148,17 +147,7 @@ toProxyUrl = toProxyUrl;
     this.receipt.set(file);
   }
 
- async copyIpan() {
-  const phone = this.paymentNumber();
-  if (!phone) return;
-  try {
-    await navigator.clipboard.writeText(phone);
-    this.copied.set(true);
-    setTimeout(() => this.copied.set(false), 2000);
-  } catch {
-    // clipboard can be blocked, the user can still select the text by hand
-  }
-}
+ 
 
   submit() {
     const service = this.selectedService();

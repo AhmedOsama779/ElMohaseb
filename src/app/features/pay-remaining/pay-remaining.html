@@ -93,29 +93,7 @@
             <span class="insta__badge">تحويل فوري ولحظي</span>
           </div>
 
-          @if (payment(); as p) {
-            <div class="insta__grid">
-              <div class="insta__item">
-                <span class="insta__label">اسم الحساب / المستلم المعتمد</span>
-                <strong>{{ p.accountName }}</strong>
-              </div>
-
-              <div class="insta__item">
-                <span class="insta__label">رقم الدفع عبر إنستاباي (رقم الهاتف)</span>
-                <span class="insta__id">
-                  <code dir="ltr">{{ phone() }}</code>
-                  <button type="button" class="copy" (click)="copyPhone()">
-                    {{ copied() ? 'تم النسخ' : 'نسخ الرقم' }}
-                  </button>
-                </span>
-                @if (p.notes) {
-                  <small class="insta__note">{{ p.notes }}</small>
-                }
-              </div>
-            </div>
-          } @else {
-            <p class="insta__note">بيانات الدفع غير متاحة حاليًا، يرجى المحاولة لاحقًا.</p>
-          }
+        <app-payment-accounts [accounts]="accounts()" />
         </section>
 
         <section class="form">

@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { ApiResponse, DocumentStatus, PagedResult, PaymentInfo, RequestCreated, RequestDetails, RequestOrder , ContactInfo } from '../models/api.models';@Injectable({ providedIn: 'root' })
+import { ApiResponse, DocumentStatus, PagedResult, PaymentAccount, RequestCreated, RequestDetails, RequestOrder , ContactInfo } from '../models/api.models';@Injectable({ providedIn: 'root' })
 export class Catalog {
   private http = inject(HttpClient);
   private base = environment.mainApiUrl;
@@ -13,11 +13,11 @@ export class Catalog {
       .pipe(map(res => res.data));
   }
 
-  getPaymentInfo() {
-    return this.http
-      .get<ApiResponse<PaymentInfo>>(`${this.base}/Payment/Payment`)
-      .pipe(map(res => res.data));
-  }
+  getPaymentAccounts() {
+  return this.http
+    .get<ApiResponse<PaymentAccount[]>>(`${this.base}/Payment/Payment`)
+    .pipe(map(res => res.data ?? []));
+}
 
   submitRequest(serviceId: number, receipt: File, docs: { id: number; file: File }[]) {
     // Files travel as multipart/form-data. Don't set the Content-Type header yourself:

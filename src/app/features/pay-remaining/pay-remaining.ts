@@ -2,16 +2,18 @@ import { DecimalPipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
-import { PaymentInfo, RequestDetails } from '../../core/models/api.models';
+import {  RequestDetails , PaymentAccount} from '../../core/models/api.models';
 import { Catalog } from '../../core/services/catalog';
-import { formatDate, formatEgyptPhone } from '../../shared/utils/format';
+import { formatDate } from '../../shared/utils/format';
+import { PaymentAccounts } from '../../shared/components/payment-accounts/payment-accounts';
+
 
 const MAX_BYTES = 5 * 1024 * 1024;
 const RECEIPT_TYPES = ['image/jpeg', 'image/png'];
 
 @Component({
   selector: 'app-pay-remaining',
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe , PaymentAccounts],
   templateUrl: './pay-remaining.html',
   styleUrl: './pay-remaining.scss',
 })
@@ -27,9 +29,6 @@ export class PayRemaining {
   loading = signal(true);
   error = signal<string | null>(null);
 
-  payment = signal<PaymentInfo | null>(null);
-  phone = computed(() => formatEgyptPhone(this.payment()?.ipan));
-  copied = signal(false);
 
   receipt = signal<File | null>(null);
   fileError = signal<string | null>(null);
@@ -38,12 +37,14 @@ export class PayRemaining {
   submitting = signal(false);
   submitErrors = signal<string[]>([]);
   done = signal(false);
+  accounts = signal<PaymentAccount[]>([])
 
   canSubmit = computed(
     () => !!this.request() && !!this.receipt() && !this.submitting()
   );
 
   constructor() {
+
     forkJoin({
       details: this.catalog.getRequest(this.requestId),
       // The details endpoint has no service name, so we find it in the orders list
@@ -65,10 +66,10 @@ export class PayRemaining {
       },
     });
 
-    this.catalog.getPaymentInfo().subscribe({
-      next: info => this.payment.set(info),
-      error: () => this.payment.set(null), // 404 means the admin hasn't added payment info yet
-    });
+    this.catalog.getPaymentAccounts().subscribe({
+  next: list => this.accounts.set(list),
+  error: () => this.accounts.set([]),
+});
   }
 
   onFileInput(event: Event) {
@@ -92,17 +93,7 @@ export class PayRemaining {
     this.accept(event.dataTransfer?.files?.[0]);
   }
 
-  async copyPhone() {
-    const phone = this.phone();
-    if (!phone) return;
-    try {
-      await navigator.clipboard.writeText(phone);
-      this.copied.set(true);
-      setTimeout(() => this.copied.set(false), 2000);
-    } catch {
-      // clipboard can be blocked, the user can still select the text by hand
-    }
-  }
+  
 
   submit() {
     const request = this.request();

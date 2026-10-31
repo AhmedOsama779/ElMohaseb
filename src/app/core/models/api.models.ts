@@ -143,7 +143,18 @@ export interface ContactInfo {
 // What the PUT endpoint accepts (everything except the fields the server fills in)
 export type ContactInput = Omit<ContactInfo, 'id' | 'updatedAt'>;
 
+export interface AccountType {
+  id: number;
+  accountType: string;
+}
 
+export interface PaymentAccount {
+  id: number;
+  ipan: string;
+  accountName: string;
+  notes: string | null;
+  accountType: AccountType;
+}
 
 
 

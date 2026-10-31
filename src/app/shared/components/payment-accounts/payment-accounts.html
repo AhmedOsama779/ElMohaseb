@@ -1,0 +1,43 @@
+<section class="accounts">
+  <h3 class="accounts__title">حسابات الدفع المعتمدة</h3>
+  <p class="accounts__hint">يمكنك التحويل إلى أي من الحسابات التالية.</p>
+
+  @for (a of accounts(); track a.id) {
+    <article class="account">
+      <strong class="account__type">{{ a.accountType?.accountType }}</strong>
+
+      <dl class="account__body">
+        <div>
+          <dt>اسم المستلم</dt>
+          <dd>{{ a.accountName }}</dd>
+        </div>
+
+        <div>
+          <dt>{{ label(a) }}</dt>
+          <dd class="id">
+            <code dir="ltr">{{ display(a) }}</code>
+            <button type="button" class="copy" (click)="copy(a)" [attr.aria-label]="'نسخ ' + label(a)">
+              @if (copiedId() === a.id) {
+                <small>تم النسخ</small>
+              } @else {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="11" height="11" rx="2" />
+                  <path d="M5 15V6a2 2 0 012-2h9" />
+                </svg>
+              }
+            </button>
+          </dd>
+        </div>
+
+        @if (a.notes) {
+          <div class="account__notes">
+            <dt>ملاحظات وتعليمات التحويل</dt>
+            <dd>{{ a.notes }}</dd>
+          </div>
+        }
+      </dl>
+    </article>
+  } @empty {
+    <p class="accounts__empty">بيانات الدفع غير متاحة حاليًا، يرجى المحاولة لاحقًا.</p>
+  }
+</section>
