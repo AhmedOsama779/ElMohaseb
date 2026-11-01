@@ -1,56 +1,95 @@
 .accounts {
   margin-bottom: 32px;
 
-  &__title { margin-bottom: 4px; font-size: 14px; font-weight: 700; }
-  &__hint { margin-bottom: 16px; font-size: 12px; color: var(--color-muted); }
+  // Cards sit side by side and drop to 2 or 1 per row on smaller screens
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
   &__empty { font-size: 12px; color: var(--color-muted); }
 }
 
 .account {
-  padding: 16px;
-  margin-bottom: 12px;
-  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 10px;
 
-  &__type { display: block; margin-bottom: 12px; font-size: 14px; color: var(--color-primary); }
-
-  &__body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-
-    @media (max-width: 600px) { grid-template-columns: 1fr; }
-
-    dt { margin-bottom: 4px; font-size: 11px; color: var(--color-muted); }
-    dd { font-size: 14px; font-weight: 600; line-height: 1.7; }
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  &__notes { grid-column: 1 / -1; dd { font-weight: 400; font-size: 13px; } }
-}
+  &__icon {
+    display: flex;
+    color: var(--color-primary);
+  }
 
-.id {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  &__type {
+    font-size: 15px;
+    font-weight: 700;
+  }
 
-  code {
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__label {
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__value {
     font-family: ui-monospace, 'Courier New', monospace;
     font-size: 13px;
+    font-weight: 600;
     color: var(--color-primary);
     word-break: break-all;
+  }
+
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+
+  &__notes {
+    margin-top: auto;           // pushes the notes to the bottom so cards line up
+    padding-top: 12px;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--color-muted);
+    border-top: 1px solid var(--color-border);
   }
 }
 
 .copy {
   display: flex;
   align-items: center;
-  padding: 2px;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 2px 4px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--color-primary);
   background: none;
   border: none;
-  color: var(--color-muted);
   cursor: pointer;
 
-  &:hover { color: var(--color-primary); }
-  small { font-size: 11px; color: var(--color-primary); }
+  &:hover { text-decoration: underline; }
 }
