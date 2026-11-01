@@ -157,4 +157,13 @@ export interface PaymentAccount {
 }
 
 
+// A company that works with us, shown in the home page slideshow
+export interface ClientItem {
+  id: number;
+  name: string;
+  description: string; // the client's field of work
+  url: string;         // logo
+}
+
+
 

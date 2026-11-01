@@ -14,6 +14,7 @@
   } @else {
     <div class="home__grid">
       @for (category of categories(); track category.id) {
+        <!-- Visitors who are not logged in are sent to the login page by authGuard -->
         <a class="card" [routerLink]="['/categories', category.id]">
           <img class="card__img" [src]="toProxyUrl(category.url)" [alt]="category.name" loading="lazy" />
           <div class="card__body">
@@ -23,5 +24,82 @@
         </a>
       }
     </div>
+  }
+
+  @if (clients().length) {
+    <section class="clients" aria-labelledby="clients-title">
+      <div class="clients__head">
+        <span class="clients__chip">شركاء النجاح</span>
+        <h2 id="clients-title" class="clients__title">علامات وشركات رائدة تضع ثقتها في المحاسب</h2>
+        <p class="clients__text">
+          نفتخر بتقديم خدمات التأسيس والاستشارات المالية والمحاسبية لنخبة من الشركات والمؤسسات في
+          مختلف القطاعات.
+        </p>
+      </div>
+
+      <div class="clients__bar">
+        <span class="clients__label"><i class="clients__dot"></i>شركاؤنا عبر مختلف القطاعات</span>
+
+        @if (canSlide()) {
+          <div class="clients__nav">
+            <button type="button" class="clients__btn" (click)="prev()" aria-label="السابق">→</button>
+            <button type="button" class="clients__btn" (click)="next()" aria-label="التالي">←</button>
+          </div>
+        }
+      </div>
+
+      <div
+        class="slider"
+        (mouseenter)="paused.set(true)"
+        (mouseleave)="paused.set(false)"
+        (focusin)="paused.set(true)"
+        (focusout)="paused.set(false)"
+      >
+        <div class="slider__track" [style.transform]="trackTransform()" [style.--per-view]="perView()">
+          @for (client of clients(); track client.id) {
+            <article class="slide">
+              <div class="client">
+                <div class="client__logo">
+                  @if (isBroken(client.id)) {
+                    <span class="client__initial">{{ client.name.charAt(0) }}</span>
+                  } @else {
+                    <img
+                      [src]="toProxyUrl(client.url)"
+                      [alt]="client.name"
+                      loading="lazy"
+                      (error)="markBroken(client.id)"
+                    />
+                  }
+                </div>
+                <strong class="client__name">{{ client.name }}</strong>
+                <small class="client__field">{{ client.description }}</small>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+
+      @if (canSlide()) {
+        <div class="clients__dots">
+          @for (i of dots(); track i) {
+            <button
+              type="button"
+              class="clients__dot-btn"
+              [class.active]="i === page()"
+              (click)="goTo(i)"
+              [attr.aria-label]="'المجموعة ' + (i + 1)"
+            ></button>
+          }
+        </div>
+      }
+
+      <p class="clients__trust">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8 12.5l3 3 5-6" />
+        </svg>
+        +150 شركة ومؤسسة تثق بحلولنا الإدارية والمالية
+      </p>
+    </section>
   }
 </main>

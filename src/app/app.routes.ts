@@ -12,13 +12,8 @@ import { MyOrders } from './features/my-orders/my-orders';
 import { PayRemaining } from './features/pay-remaining/pay-remaining';
 import { About } from './features/about/about';
 
-
-
-
-
-
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: '',
     component: AuthShell,
@@ -30,11 +25,10 @@ export const routes: Routes = [
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'verify-otp', component: VerifyOtp },
   { path: 'reset-password', component: ResetPassword },
-  { path: 'home', component: Home, canActivate: [authGuard] },
+  { path: 'home', component: Home }, // public: visitors can browse, the category page asks them to log in
   { path: 'categories/:id', component: CategoryPage, canActivate: [authGuard] },
   { path: 'orders', component: MyOrders, canActivate: [authGuard] },
   { path: 'orders/:id/pay', component: PayRemaining, canActivate: [authGuard] },
   { path: 'about', component: About },
-  
- 
+  { path: '**', redirectTo: 'home' },
 ];

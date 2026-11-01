@@ -1,11 +1,7 @@
 <header class="navbar">
   <div class="navbar__inner">
 
-    @if (auth.user()) {
       <a routerLink="/home" class="navbar__logo">المحاسب</a>
-    } @else {
-      <span class="navbar__logo">المحاسب</span>
-    }
 
     <nav class="navbar__links">
       <a routerLink="/about" routerLinkActive="active">عن المحاسب / التواصل</a>

@@ -19,6 +19,8 @@ export class Login {
   // Shown after the user verifies their email
   justVerified = this.route.snapshot.queryParamMap.get('verified') === '1';
 
+    // Where to go after logging in (set by authGuard). Only in-app paths are accepted.
+  private returnUrl = this.safeReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl'));
   loading = signal(false);
   serverError = signal<string | null>(null);
 
@@ -45,7 +47,7 @@ export class Login {
     this.serverError.set(null);
 
     this.auth.login(this.form.getRawValue()).subscribe({
-     next: () => this.router.navigateByUrl('/home'),
+     next: () => this.router.navigateByUrl(this.returnUrl),
       error: err => {
   this.loading.set(false);
 
@@ -69,5 +71,9 @@ export class Login {
     if (err.status && err.status >= 500) return 'حدث خطأ في الخادم، حاول مرة أخرى لاحقًا';
     // One generic message on purpose: it doesn't reveal whether the email or the password was wrong
     return 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+  }
+  
+  private safeReturnUrl(url: string | null): string {
+    return url && url.startsWith('/') && !url.startsWith('//') ? url : '/home';
   }
 }
