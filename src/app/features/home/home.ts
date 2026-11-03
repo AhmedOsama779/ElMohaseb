@@ -29,6 +29,9 @@ export class Home {
   page = signal(0);
   paused = signal(false);                 // true while the mouse is over the slideshow
   brokenLogos = signal<number[]>([]);     // clients whose logo failed to load
+  
+  private timer: ReturnType<typeof setInterval> | null = null;
+  private reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   canSlide = computed(() => this.clients().length > this.perView());
   pages = computed(() => Math.max(1, Math.ceil(this.clients().length / this.perView())));
@@ -59,25 +62,44 @@ export class Home {
       error: () => this.clients.set([]),
     });
 
-    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (!reduceMotion) {
-      const timer = setInterval(() => {
-        if (!this.paused() && this.canSlide()) this.next();
-      }, AUTOPLAY_MS);
-      inject(DestroyRef).onDestroy(() => clearInterval(timer));
-    }
+    this.startTimer();
+    inject(DestroyRef).onDestroy(() => this.stopTimer());
   }
 
-  next() {
+    // Used by the automatic timer: moves one step without touching the timer
+  private advance() {
     this.page.update(p => (p + 1) % this.pages());
+  }
+
+  // The methods below are for the visitor's clicks, so they restart the 4-second countdown from zero
+  next() {
+    this.advance();
+    this.startTimer();
   }
 
   prev() {
     this.page.update(p => (p - 1 + this.pages()) % this.pages());
+    this.startTimer();
   }
 
   goTo(index: number) {
     this.page.set(index);
+    this.startTimer();
+  }
+
+  private startTimer() {
+    this.stopTimer();
+    if (this.reduceMotion) return;
+    this.timer = setInterval(() => {
+      if (!this.paused() && this.canSlide()) this.advance();
+    }, AUTOPLAY_MS);
+  }
+
+  private stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   }
 
   onResize() {
